@@ -1,0 +1,36 @@
+# .clangd.yaml
+#
+# GCC is the compiler; clangd (Clang-based) is used only for IntelliSense.
+#
+# Known limitation: `import std;` will show a diagnostic in clangd because
+# clangd cannot consume GCC's .gcm module format or bits/std.cc.
+# The build works correctly — this is purely a clangd limitation tracked at:
+# https://github.com/clangd/clangd/issues/2610
+#
+# --query-driver in settings.json lets clangd interrogate g++ for its
+# system include paths dynamically, so no GCC version numbers are hardcoded
+# here (they change with every Rawhide snapshot).
+
+CompileFlags:
+  Add:
+    - "-std=c++26"
+    - "-freflection"
+    - "--gcc-toolchain=/usr"
+  Remove:
+    # GCC module-scanner flags clangd doesn't understand:
+    - "-fmodules-ts"
+    - "-fmodule-mapper*"
+    - "-fdeps-format*"
+    - "-fpreprocessed"
+
+  Compiler: g++
+
+Diagnostics:
+  Suppress:
+    # `import std;` cannot be resolved by clangd when using GCC/libstdc++.
+    # The build works fine; this is a clangd limitation, not a code error.
+    - "import-not-found"
+    - "module-not-found"
+
+Index:
+  StandardLibrary: Yes

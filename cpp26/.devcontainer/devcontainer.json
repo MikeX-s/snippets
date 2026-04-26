@@ -1,0 +1,58 @@
+{
+  "name": "C++26 (GCC 16 trunk — Fedora Rawhide)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "USERNAME": "dev",
+      "USER_UID": "1000",
+      "USER_GID": "1000"
+    }
+  },
+
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "dev",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack",
+        "ms-vscode.cmake-tools",
+        "llvm-vs-code-extensions.vscode-clangd",
+        "twxs.cmake",
+        "vadimcn.vscode-lldb",
+        "xaver.clang-format",
+        "eamodio.gitlens",
+        "cschlosser.doxdocgen",
+        "usernamehw.errorlens",
+        "ms-vscode.hexeditor"
+      ],
+      "settings": {
+        // clangd args live exclusively in .vscode/settings.json
+        "C_Cpp.intelliSenseEngine": "disabled",
+
+        "cmake.generator": "Ninja",
+        "cmake.configureArgs": [
+          "-DCMAKE_C_COMPILER=gcc",
+          "-DCMAKE_CXX_COMPILER=g++",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+        ],
+
+        "editor.formatOnSave": true,
+        "[cpp]": {
+          "editor.defaultFormatter": "xaver.clang-format"
+        },
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+
+  "postCreateCommand": "echo '✅ Container ready.' && echo \"GCC:   $(g++ --version | head -1)\" && echo \"Clang: $(clang++ --version | head -1)\" && echo \"CMake: $(cmake --version | head -1)\"",
+
+  "mounts": [
+    "source=cpp26-ccache,target=/home/dev/.cache/ccache,type=volume"
+  ],
+
+  "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"]
+}
