@@ -1,6 +1,4 @@
-#include <meta>
-#include <print>
-#include <string>
+import std;
 
 struct Person {
   std::string name;
