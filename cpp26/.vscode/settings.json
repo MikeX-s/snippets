@@ -1,25 +1,18 @@
 {
     "C_Cpp.intelliSenseEngine": "disabled",
-
     "clangd.arguments": [
         "--background-index",
         "--clang-tidy",
-        // query-driver lets clangd ask g++ for its system include paths
-        // dynamically — avoids hardcoding the GCC version in .clangd.yaml
-        "--query-driver=/usr/bin/g++,/usr/bin/gcc,/usr/lib/gcc/**/*",
+        "--query-driver=/usr/bin/g++*,/usr/bin/gcc*,/usr/lib/gcc/**",
         "--all-scopes-completion",
         "--completion-style=detailed",
         "--header-insertion=never",
         "--compile-commands-dir=${workspaceFolder}"
     ],
-
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "xaver.clang-format",
-
     "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
     "cmake.configureArgs": [
-        "-DCMAKE_C_COMPILER=gcc",
-        "-DCMAKE_CXX_COMPILER=g++",
         "-DCMAKE_CXX_STANDARD=26",
         "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
     ]

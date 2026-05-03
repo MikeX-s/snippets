@@ -1,5 +1,8 @@
 {
-  "name": "C++26 (GCC 16 trunk — Fedora Rawhide)",
+  // -------------------------------------------------------
+  //  VSCode Dev Container — C++23/26 with GCC 16 / Clang 21
+  // -------------------------------------------------------
+  "name": "C++23/26 (GCC 16 trunk)",
   "build": {
     "dockerfile": "Dockerfile",
     "args": {
@@ -9,50 +12,84 @@
     }
   },
 
+  // Mount your workspace into the container
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
   "workspaceFolder": "/workspace",
+
+  // Run as the non-root dev user
   "remoteUser": "dev",
 
+  // Forward ports if your project serves anything
+  // "forwardPorts": [8080],
+
+  // -------------------------------------------------------
+  //  VSCode extensions installed inside the container
+  // -------------------------------------------------------
   "customizations": {
     "vscode": {
       "extensions": [
+        // Core C++ support
         "ms-vscode.cpptools",
         "ms-vscode.cpptools-extension-pack",
         "ms-vscode.cmake-tools",
+        // clangd LSP (better IntelliSense for modern C++)
         "llvm-vs-code-extensions.vscode-clangd",
+        // CMake language support
         "twxs.cmake",
+        // Debugging
         "vadimcn.vscode-lldb",
+        // Formatting / linting
         "xaver.clang-format",
+        // Git
         "eamodio.gitlens",
+        // Doxygen
         "cschlosser.doxdocgen",
+        // Better error highlighting
         "usernamehw.errorlens",
+        // Hex editor (handy for binary inspection)
         "ms-vscode.hexeditor"
       ],
       "settings": {
-        // clangd args live exclusively in .vscode/settings.json
+        // Use clangd instead of the built-in IntelliSense engine
         "C_Cpp.intelliSenseEngine": "disabled",
-
-        "cmake.generator": "Ninja",
-        "cmake.configureArgs": [
-          "-DCMAKE_C_COMPILER=gcc",
-          "-DCMAKE_CXX_COMPILER=g++",
-          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+        "clangd.path": "/usr/bin/clangd",
+        "clangd.arguments": [
+          "--background-index",
+          "--clang-tidy",
+          "--completion-style=detailed",
+          "--header-insertion=iwyu",
+          "--suggest-missing-includes"
         ],
 
+        // Default compiler: GCC 16
+        "cmake.generator": "Ninja",
+        "cmake.configureArgs": [
+          "-DCMAKE_CXX_STANDARD=26",
+          "-DCMAKE_C_COMPILER=gcc",
+          "-DCMAKE_CXX_COMPILER=g++"
+        ],
+
+        // clang-format on save
         "editor.formatOnSave": true,
         "[cpp]": {
           "editor.defaultFormatter": "xaver.clang-format"
         },
+
+        // Terminal
         "terminal.integrated.defaultProfile.linux": "bash"
       }
     }
   },
 
-  "postCreateCommand": "echo '✅ Container ready.' && echo \"GCC:   $(g++ --version | head -1)\" && echo \"Clang: $(clang++ --version | head -1)\" && echo \"CMake: $(cmake --version | head -1)\"",
+  // Lifecycle hooks
+  "postCreateCommand": "echo '✅ Container ready. GCC: '$(g++ --version | head -1)' | Clang: '$(clang++ --version | head -1)",
 
+  // Mounts for ccache (speeds up rebuilds)
   "mounts": [
     "source=cpp26-ccache,target=/home/dev/.cache/ccache,type=volume"
   ],
 
+  // Resource hints (adjust to your machine)
   "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"]
+  //  ^ needed for gdb / lldb to attach to processes inside the container
 }
